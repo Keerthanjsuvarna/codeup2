@@ -47,9 +47,9 @@
 // }
 
 
-const config= require('../config/database')
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const config = require('../config/database');
 
 const UserSchema = mongoose.Schema({
   name: {
@@ -74,15 +74,15 @@ const User = mongoose.model('User', UserSchema);
 
 module.exports = User;
 
-module.exports.getUserById = function(id) {
+module.exports.getUserById = function (id) {
   return User.findById(id);
 };
 
-module.exports.getUserByUsername = function(username) {
-  return User.findOne({ username });
+module.exports.getUserByUsername = function (username) {
+  return User.findOne({ username }).select('+password');
 };
 
-module.exports.addUser = async function(newUser) {
+module.exports.addUser = async function (newUser) {
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(newUser.password, salt);
@@ -93,16 +93,10 @@ module.exports.addUser = async function(newUser) {
   }
 };
 
-// module.exports.comparePassword = async function(candidatePassword, hash, callback){
-//     bcrypt.compare(candidatePassword ,hash , (err, isMatch) => {
-//        if(err) throw err;
-//        callback(null, isMatch);
-//     });
-module.exports.comparePassword = async function(candidatePassword, hash) {
+module.exports.comparePassword = async function (candidatePassword, hash) {
   try {
     return await bcrypt.compare(candidatePassword, hash);
   } catch (error) {
     throw error;
   }
 };
-
